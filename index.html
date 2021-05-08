@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Find My: Apple Store</title>
+<meta name="description" content="Easy find Apple Store in any region. Made with MapKit JS." />
+<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+<style>
+    * {
+        font-family: "futura";
+    }
+    #map {
+        width: 98vw;
+        height: 98vh;
+    }
+</style>
+</head>
+
+<body>
+    <b>Find My: Apple Store</b> | 
+    <small>Powered by Apple MapKit JS</small> | 
+    <button type="button" onclick="mapSearch()">Search this area!</button>
+
+    <div id="map"></div>
+
+    <script>
+        // Replace your token (https://maps.developer.apple.com/token-maker)
+        const tokenID = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlQyV0dGSkYzQkoifQ.eyJpc3MiOiI5UEFITFRHOEFEIiwiaWF0IjoxNjIwNDg2MTA2LCJleHAiOjE2NTE5NjgwMDAsIm9yaWdpbiI6Imh0dHBzOi8vZmluZG15YXBwbGVzdG9yZS52ZXJjZWwuYXBwIn0.0LUYWEC_HQWizHGenPGXgD76xFbi6bR1RYqwwyvNATJtv_HOcZfO4UNQ0dj9nRnHWb3gLG-CCKCYLXIo0W88Qg";
+
+        mapkit.init({
+            authorizationCallback: function(done) {
+                done(tokenID);
+            }
+        });
+
+        var map = new mapkit.Map("map");
+        map.region = World;
+
+        function mapSearch() {
+            var search = new mapkit.Search({ region: map.region });
+            search.search("Apple Store", function(error, data) {
+                if (error) {
+                    // Handle search error
+                    return;
+                }
+                var annotations = data.places.map(function(place) {
+                    var annotation = new mapkit.MarkerAnnotation(place.coordinate);
+                    annotation.title = place.name;
+                    annotation.subtitle = place.formattedAddress;
+                    annotation.color = "#a6d6d6";
+                    return annotation;
+                });
+                map.showItems(annotations);
+            });
+        }
+    </script>
+</body>
+</html>
