@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <meta charset="utf-8">
-   <title>Find My: Apple Store</title>
-   <meta name="description" content="Easy find Apple Store in any region. Made with MapKit JS." />
-   <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-   <style>
-       * {
-           font-family: "futura";
-       }
-       #map {
-           width: 98vw;
-           height: 96vh;
-       }
-   </style>
+<meta charset="utf-8">
+<title>Find My: Apple Store</title>
+<meta name="description" content="Easy find Apple Store in any region. Made with MapKit JS." />
+<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+<style>
+    * {
+        font-family: "futura";
+    }
+    #map {
+        width: 100%;
+        height: 93vh;
+        margin: auto;
+        padding-top: 1vh;
+    }
+    .rt-root {
+        border-radius: 15px;
+    }
+    @media (prefers-color-scheme: dark) {
+        body {
+            background-color: #202124;
+            color: white;
+            padding: 15px;
+        }
+    }
+</style>
 </head>
 
 <body>
@@ -41,6 +53,7 @@
             search.search("Apple Store", function(error, data) {
                 if (error) {
                     // Handle search error
+                    alert("Error occur! Please try again later.");
                     return;
                 }
                 var annotations = data.places.map(function(place) {
