@@ -1,47 +1,723 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="version" content="1.1">
-<title>Find My: Apple Store</title>
-<meta name="description" content="Easy find Apple Store in any region. Made with MapKit JS." />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="version" content="2.0">
+<title>Find My: Apple Store - Locate Apple Stores Worldwide with Interactive Map</title>
+<meta name="description" content="Find Apple Store locations worldwide with our interactive map powered by Apple MapKit JS. Search by region, view store details, and get directions to the nearest Apple Store." />
+<meta name="keywords" content="Apple Store, Apple Store locations, find Apple Store, Apple retail, Apple Store map, Apple Store locator, Apple MapKit">
+<meta name="author" content="Find My Apple Store">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://findmyapplestore.com/">
+<meta property="og:title" content="Find My: Apple Store - Interactive Apple Store Locator">
+<meta property="og:description" content="Locate Apple Stores worldwide with our interactive map. Find store details, addresses, and get directions easily.">
+<meta property="og:image" content="https://findmyapplestore.com/og-image.jpg">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://findmyapplestore.com/">
+<meta property="twitter:title" content="Find My: Apple Store - Interactive Apple Store Locator">
+<meta property="twitter:description" content="Locate Apple Stores worldwide with our interactive map. Find store details, addresses, and get directions easily.">
+<meta property="twitter:image" content="https://findmyapplestore.com/twitter-image.jpg">
+
+<!-- Favicons -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#007aff">
+
+<!-- Apple Web App -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Find My Apple Store">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://findmyapplestore.com/">
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Find My: Apple Store",
+  "description": "Interactive Apple Store locator with worldwide coverage",
+  "url": "https://findmyapplestore.com/",
+  "applicationCategory": "NavigationApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+
 <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+<link rel="stylesheet" href="https://cdn.1998.media/css/fontawesome.css">
 <style>
     * {
-        font-family: "futura";
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "futura", sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    #map {
+    
+    body {
+        height: 100vh;
+    }
+    
+    .topbar {
+        background: #f5f5f7;
+        padding: 15px 20px;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .topbar-title {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .version-badge {
+        background: linear-gradient(135deg, #007aff 0%, #0051d4 100%);
+        color: white;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 3px 8px;
+        border-radius: 12px;
+        line-height: 1;
+        text-transform: uppercase;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .topbar-subtitle {
+        color: #666;
+    }
+    
+    .search-btn {
+        margin-left: auto;
+        padding: 8px 16px;
+        background: #007aff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .search-btn:hover {
+        background: #0056cc;
+    }
+    
+    .search-btn i {
+        font-size: 14px;
+    }
+    
+    .region-select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: inherit;
+        background: white;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    
+    .theme-select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: inherit;
+        background: white;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    
+    .language-select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: inherit;
+        background: white;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    
+    .topbar-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+    }
+    
+    .container {
+        display: flex;
+        height: calc(100vh - 60px);
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .sidebar {
+        width: 350px;
+        background: #f5f5f7;
+        border-radius: 15px;
+        padding: 20px;
+        overflow-y: auto;
+        display: none;
+    }
+    
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    .sidebar-header.hidden {
+        display: none;
+    }
+    
+    .maps-btn {
+        padding: 6px 12px;
+        background: #34c759;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .maps-btn:hover {
+        background: #30b753;
+    }
+    
+    .maps-btn i {
+        font-size: 10px;
+    }
+    
+    .reset-btn {
+        padding: 8px 16px;
+        background: #ff3b30;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .reset-btn:hover {
+        background: #d70015;
+    }
+    
+    .reset-btn i {
+        font-size: 14px;
+    }
+    
+    .reset-btn.hidden {
+        display: none;
+    }
+    
+    .maps-btn.hidden {
+        display: none;
+    }
+    
+    .search-field {
         width: 100%;
-        height: 93vh;
-        margin: auto;
-        padding-top: 1vh;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: inherit;
+        margin-bottom: 15px;
+        background: white;
+        display: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
     }
+    
+    .search-field.show {
+        display: block;
+    }
+    
+    .search-field:focus {
+        outline: none;
+        border-color: #007aff;
+    }
+    
+    .skeleton-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 10px;
+        animation: pulse 1.5s ease-in-out infinite alternate;
+    }
+    
+    .skeleton-name {
+        height: 18px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        width: 70%;
+    }
+    
+    .skeleton-address {
+        height: 14px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        width: 90%;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    
+    .store-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .store-item:hover {
+        background: #e8e8ed;
+    }
+    
+    .store-icon {
+        width: 40px;
+        height: 40px;
+        background: #007aff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .store-icon i {
+        font-size: 20px;
+        color: white;
+    }
+    
+    .store-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .store-name {
+        font-weight: bold;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 16px;
+    }
+    
+    .store-name::before {
+        content: "|";
+        color: #007aff;
+        font-weight: normal;
+        font-size: 18px;
+    }
+    
+    .store-address {
+        font-size: 14px;
+        color: #666;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .store-address::before {
+        content: "|";
+        color: #ccc;
+        font-weight: normal;
+        font-size: 16px;
+    }
+    
+    .no-data-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .no-data-icon {
+        font-size: 48px;
+        color: #ccc;
+        margin-bottom: 15px;
+    }
+    
+    .no-data-text {
+        color: #666;
+        font-size: 16px;
+    }
+    
+    #map {
+        flex: 1;
+        border-radius: 15px;
+    }
+    
     .rt-root {
         border-radius: 15px;
     }
     .mk-map-view {
         border-radius: 15px;
     }
+    
+    /* Mobile/Tablet layout */
+    @media (max-width: 767px) {
+        .container {
+            flex-direction: column;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar {
+            display: block;
+            width: 100%;
+            height: 40%;
+            order: 2;
+        }
+        
+        #map {
+            height: 60%;
+            order: 1;
+        }
+    }
+    
+    /* Desktop layout */
+    @media (min-width: 768px) {
+        .sidebar {
+            display: block;
+        }
+    }
+    
     @media (prefers-color-scheme: dark) {
         body {
             background-color: #202124;
             color: white;
-            padding: 15px;
         }
+        
+        .topbar {
+            background: #2d2d30;
+            border-bottom: 1px solid #444;
+        }
+        
+        .topbar-subtitle {
+            color: #ccc;
+        }
+        
+        .search-btn {
+            background: #0a84ff;
+        }
+        
+        .search-btn:hover {
+            background: #0071e3;
+        }
+        
+        .sidebar {
+            background: #2d2d30;
+        }
+        
+        .store-item {
+            background: #3c3c41;
+            color: white;
+        }
+        
+        .store-item:hover {
+            background: #4a4a4f;
+        }
+        
+        .store-address {
+            color: #ccc;
+        }
+        
+        .region-select {
+            background: #3c3c41;
+            border: 1px solid #555;
+            color: white;
+        }
+        
+        .theme-select {
+            background: #3c3c41;
+            border: 1px solid #555;
+            color: white;
+        }
+
+        .language-select {
+            background: #3c3c41;
+            border: 1px solid #555;
+            color: white;
+        }
+
+        .search-field {
+            background: #3c3c41;
+            border: 1px solid #555;
+            color: white;
+            background-image: none;
+        }
+
+        .skeleton-item {
+            background: #3c3c41;
+        }
+        
+        .skeleton-name,
+        .skeleton-address {
+            background: #555;
+        }
+
+        .maps-btn {
+            background: #008080;
+        }
+        
+        .maps-btn:hover {
+            background: #014f4f;
+        }
+        
+        .reset-btn {
+            background: #d70015;
+        }
+        
+        .reset-btn:hover {
+            background: #c20012;
+        }
+
+        .version-badge {
+            background: linear-gradient(135deg, #0a84ff 0%, #0066cc 100%);
+        }
+    }
+    
+    /* Manual theme overrides */
+    body[data-theme="light"] {
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    body[data-theme="light"] .topbar {
+        background: #f5f5f7 !important;
+        border-bottom: 1px solid #e0e0e0 !important;
+    }
+    
+    body[data-theme="light"] .topbar-subtitle {
+        color: #666 !important;
+    }
+    
+    body[data-theme="light"] .search-btn {
+        background: #007aff !important;
+    }
+    
+    body[data-theme="light"] .search-btn:hover {
+        background: #0056cc !important;
+    }
+    
+    body[data-theme="light"] .sidebar {
+        background: #f5f5f7 !important;
+    }
+    
+    body[data-theme="light"] .store-item {
+        background: white !important;
+        color: black !important;
+    }
+    
+    body[data-theme="light"] .store-item:hover {
+        background: #e8e8ed !important;
+    }
+    
+    body[data-theme="light"] .store-address {
+        color: #666 !important;
+    }
+    
+    body[data-theme="light"] .region-select,
+    body[data-theme="light"] .theme-select {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        color: black !important;
+    }
+    
+    body[data-theme="light"] .search-field {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        color: black !important;
+        background-image: none !important;
+    }
+    
+    body[data-theme="light"] .skeleton-item {
+        background: white !important;
+    }
+    
+    body[data-theme="light"] .skeleton-name,
+    body[data-theme="light"] .skeleton-address {
+        background: #e0e0e0 !important;
+    }
+    
+    body[data-theme="dark"] {
+        background-color: #202124 !important;
+        color: white !important;
+    }
+    
+    body[data-theme="dark"] .topbar {
+        background: #2d2d30 !important;
+        border-bottom: 1px solid #444 !important;
+    }
+    
+    body[data-theme="dark"] .topbar-subtitle {
+        color: #ccc !important;
+    }
+    
+    body[data-theme="dark"] .search-btn {
+        background: #0a84ff !important;
+    }
+    
+    body[data-theme="dark"] .search-btn:hover {
+        background: #0071e3 !important;
+    }
+    
+    body[data-theme="dark"] .sidebar {
+        background: #2d2d30 !important;
+    }
+    
+    body[data-theme="dark"] .store-item {
+        background: #3c3c41 !important;
+        color: white !important;
+    }
+    
+    body[data-theme="dark"] .store-item:hover {
+        background: #4a4a4f !important;
+    }
+    
+    body[data-theme="dark"] .store-address {
+        color: #ccc !important;
+    }
+    
+    body[data-theme="dark"] .region-select,
+    body[data-theme="dark"] .theme-select {
+        background: #3c3c41 !important;
+        border: 1px solid #555 !important;
+        color: white !important;
+    }
+    
+    body[data-theme="dark"] .search-field {
+        background: #3c3c41 !important;
+        border: 1px solid #555 !important;
+        color: white !important;
+        background-image: none !important;
+    }
+    
+    body[data-theme="dark"] .skeleton-item {
+        background: #3c3c41 !important;
+    }
+    
+    body[data-theme="dark"] .skeleton-name,
+    body[data-theme="dark"] .skeleton-address {
+        background: #555 !important;
+    }
+
+    body[data-theme="light"] .version-badge {
+        background: linear-gradient(135deg, #007aff 0%, #0051d4 100%) !important;
+    }
+    
+    body[data-theme="dark"] .version-badge {
+        background: linear-gradient(135deg, #0a84ff 0%, #0066cc 100%) !important;
     }
 </style>
 </head>
 
 <body>
-    <b>Find My: Apple Store</b> | 
-    <small>Powered by Apple MapKit JS</small> | 
-    <button type="button" onclick="mapSearch()">Search this area!</button>
+    <div class="topbar">
+        <span class="topbar-title">
+            Find My: Apple Store
+            <span class="version-badge">2.0</span>
+        </span>
+        <span class="topbar-subtitle">Powered by Apple MapKit JS</span>
+        <div class="topbar-controls">
+            <select class="region-select" id="regionSelect" onchange="changeRegion()">
+                <option value="us" selected>United States</option>
+                <option value="canada">Canada</option>
+                <option value="mexico">Mexico</option>
+                <option value="europe">Europe</option>
+                <option value="uk">United Kingdom</option>
+                <option value="asia">Asia Pacific</option>
+                <option value="japan">Japan</option>
+                <option value="hong-kong">Hong Kong</option>
+                <option value="india">India</option>
+                <option value="australia">Australia</option>
+                <option value="middle-east">Middle East</option>
+                <option value="africa">Africa</option>
+                <option value="south-america">South America</option>
+            </select>
+            <select class="theme-select" id="themeSelect" onchange="changeTheme()">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+            <button type="button" class="search-btn" onclick="mapSearch()">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+            <button type="button" class="reset-btn hidden" id="resetBtn" onclick="resetMap()">
+                <i class="fas fa-undo"></i>
+                Reset
+            </button>
+        </div>
+    </div>
 
-    <div id="map"></div>
+    <div class="container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header hidden">
+                <h3>Records</h3>
+                <div>
+                    <button type="button" class="maps-btn hidden" id="mapsBtn" onclick="openInMaps()">
+                        Open in Maps
+                        <i class="fa fa-map-pin"></i>
+                    </button>
+                </div>
+            </div>
+            <input type="text" class="search-field" id="searchField" placeholder="Search stores..." oninput="filterStores()" />
+            <div id="store-list">
+                <div class="no-data-container">
+                    <i class="fas fa-search no-data-icon"></i>
+                    <p class="no-data-text">Click "Search" to find Apple Stores</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="map"></div>
+    </div>
 
     <script>
         // Replace your token (https://maps.developer.apple.com/token-maker)
-        const tokenID = "TOKEN";
+        const tokenID = "<YOUR_TOKEN>";
 
         mapkit.init({
             authorizationCallback: function(done) {
@@ -49,26 +725,389 @@
             }
         });
 
-        var map = new mapkit.Map("map");
-        map.region = World;
+        var map = new mapkit.Map("map", {
+            colorScheme: getThemeColorScheme()
+        });
+        // Set initial US region instead of world
+        map.region = new mapkit.CoordinateRegion(
+            new mapkit.Coordinate(39.8283, -98.5795),
+            new mapkit.CoordinateSpan(25, 50)
+        );
+
+        var allStores = []; // Store all search results for filtering
+
+        function getThemeColorScheme() {
+            var themeSelect = document.getElementById('themeSelect');
+            if (!themeSelect) return window.matchMedia('(prefers-color-scheme: dark)').matches ? mapkit.Map.ColorSchemes.Dark : mapkit.Map.ColorSchemes.Light;
+            
+            var selectedTheme = themeSelect.value;
+            switch(selectedTheme) {
+                case 'light':
+                    return mapkit.Map.ColorSchemes.Light;
+                case 'dark':
+                    return mapkit.Map.ColorSchemes.Dark;
+                default:
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches ? mapkit.Map.ColorSchemes.Dark : mapkit.Map.ColorSchemes.Light;
+            }
+        }
+
+        function applyTheme(theme) {
+            var isDark = false;
+            
+            switch(theme) {
+                case 'light':
+                    isDark = false;
+                    break;
+                case 'dark':
+                    isDark = true;
+                    break;
+                default:
+                    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            
+            // Apply theme to body
+            if (isDark) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.setAttribute('data-theme', 'light');
+            }
+            
+            // Update map color scheme
+            map.colorScheme = isDark ? mapkit.Map.ColorSchemes.Dark : mapkit.Map.ColorSchemes.Light;
+        }
+
+        function changeTheme() {
+            var themeSelect = document.getElementById('themeSelect');
+            applyTheme(themeSelect.value);
+        }
+
+        // Listen for color scheme changes (only when system theme is selected)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            var themeSelect = document.getElementById('themeSelect');
+            if (themeSelect.value === 'system') {
+                applyTheme('system');
+            }
+        });
+
+        function changeRegion() {
+            var select = document.getElementById('regionSelect');
+            var selectedRegion = select.value;
+            
+            switch(selectedRegion) {
+                case 'us':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(39.8283, -98.5795),
+                        new mapkit.CoordinateSpan(25, 50)
+                    );
+                    break;
+                case 'canada':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(56.1304, -106.3468),
+                        new mapkit.CoordinateSpan(25, 70)
+                    );
+                    break;
+                case 'mexico':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(23.6345, -102.5528),
+                        new mapkit.CoordinateSpan(15, 25)
+                    );
+                    break;
+                case 'europe':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(54.5260, 15.2551),
+                        new mapkit.CoordinateSpan(30, 40)
+                    );
+                    break;
+                case 'uk':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(55.3781, -3.4360),
+                        new mapkit.CoordinateSpan(8, 10)
+                    );
+                    break;
+                case 'asia':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(34.0479, 100.6197),
+                        new mapkit.CoordinateSpan(40, 60)
+                    );
+                    break;
+                case 'japan':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(36.2048, 138.2529),
+                        new mapkit.CoordinateSpan(10, 15)
+                    );
+                    break;
+                case 'hong-kong':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(22.3193, 114.1694),
+                        new mapkit.CoordinateSpan(1, 1.5)
+                    );
+                    break;
+                case 'india':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(20.5937, 78.9629),
+                        new mapkit.CoordinateSpan(20, 25)
+                    );
+                    break;
+                case 'australia':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(-25.2744, 133.7751),
+                        new mapkit.CoordinateSpan(25, 35)
+                    );
+                    break;
+                case 'middle-east':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(29.2985, 42.5510),
+                        new mapkit.CoordinateSpan(20, 30)
+                    );
+                    break;
+                case 'africa':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(-8.7832, 34.5085),
+                        new mapkit.CoordinateSpan(50, 60)
+                    );
+                    break;
+                case 'south-america':
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(-8.7832, -55.4915),
+                        new mapkit.CoordinateSpan(40, 50)
+                    );
+                    break;
+                default:
+                    map.region = new mapkit.CoordinateRegion(
+                        new mapkit.Coordinate(39.8283, -98.5795),
+                        new mapkit.CoordinateSpan(25, 50)
+                    );
+            }
+        }
+
+        function showSkeletonItems() {
+            var storeList = document.getElementById('store-list');
+            storeList.innerHTML = '';
+            
+            for (var i = 0; i < 5; i++) {
+                var skeletonItem = document.createElement('div');
+                skeletonItem.className = 'skeleton-item';
+                skeletonItem.innerHTML = `
+                    <div class="skeleton-name"></div>
+                    <div class="skeleton-address"></div>
+                `;
+                storeList.appendChild(skeletonItem);
+            }
+        }
+        
+        function toggleSearchField(show) {
+            var searchField = document.getElementById('searchField');
+            if (show) {
+                searchField.classList.add('show');
+            } else {
+                searchField.classList.remove('show');
+                searchField.value = '';
+            }
+        }
+        
+        function toggleMapsButton(show) {
+            var mapsBtn = document.getElementById('mapsBtn');
+            if (show) {
+                mapsBtn.classList.remove('hidden');
+            } else {
+                mapsBtn.classList.add('hidden');
+            }
+        }
+        
+        function toggleResetButton(show) {
+            var resetBtn = document.getElementById('resetBtn');
+            if (show) {
+                resetBtn.classList.remove('hidden');
+            } else {
+                resetBtn.classList.add('hidden');
+            }
+        }
+        
+        function toggleSidebarHeader(show) {
+            var sidebarHeader = document.querySelector('.sidebar-header');
+            if (show) {
+                sidebarHeader.classList.remove('hidden');
+            } else {
+                sidebarHeader.classList.add('hidden');
+            }
+        }
+        
+        function resetMap() {
+            // Clear annotations and stores
+            map.removeAnnotations(map.annotations);
+            allStores = [];
+            
+            // Reset map to US region instead of world
+            map.region = new mapkit.CoordinateRegion(
+                new mapkit.Coordinate(39.8283, -98.5795),
+                new mapkit.CoordinateSpan(25, 50)
+            );
+            
+            // Reset region selector to US
+            document.getElementById('regionSelect').value = 'us';
+            
+            // Hide search field, maps button, reset button, and sidebar header
+            toggleSearchField(false);
+            toggleMapsButton(false);
+            toggleResetButton(false);
+            toggleSidebarHeader(false);
+            
+            // Reset store list
+            document.getElementById('store-list').innerHTML = `
+                <div class="no-data-container">
+                    <i class="fas fa-search no-data-icon"></i>
+                    <p class="no-data-text">Click "Search" to find Apple Stores</p>
+                </div>
+            `;
+        }
+
+        function filterStores() {
+            var searchTerm = document.getElementById('searchField').value.toLowerCase();
+            var storeList = document.getElementById('store-list');
+            storeList.innerHTML = '';
+            
+            var filteredStores = allStores.filter(function(store) {
+                return store.name.toLowerCase().includes(searchTerm) || 
+                       store.formattedAddress.toLowerCase().includes(searchTerm);
+            });
+            
+            if (filteredStores.length === 0 && searchTerm !== '') {
+                storeList.innerHTML = `
+                    <div class="no-data-container">
+                        <i class="fas fa-search-minus no-data-icon"></i>
+                        <p class="no-data-text">No stores found matching your search.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (filteredStores.length === 0 && searchTerm === '') {
+                filteredStores = allStores;
+            }
+            
+            filteredStores.forEach(function(place, index) {
+                var storeItem = document.createElement('div');
+                storeItem.className = 'store-item';
+                storeItem.innerHTML = `
+                    <div class="store-icon">
+                        <i class="fa-brands fa-apple"></i>
+                    </div>
+                    <div class="store-content">
+                        <div class="store-name">${place.name}</div>
+                        <div class="store-address">${place.formattedAddress}</div>
+                    </div>
+                `;
+                
+                storeItem.addEventListener('click', function() {
+                    map.setCenterAnimated(place.coordinate, true);
+                    var originalIndex = allStores.indexOf(place);
+                    if (originalIndex !== -1) {
+                        map.annotations[originalIndex].selected = true;
+                    }
+                });
+                
+                storeList.appendChild(storeItem);
+            });
+        }
 
         function mapSearch() {
             var search = new mapkit.Search({ region: map.region });
+            
+            // Show skeleton loading
+            showSkeletonItems();
+            toggleSearchField(false);
+            toggleMapsButton(false);
+            toggleSidebarHeader(false);
+            
             search.search("Apple Store", function(error, data) {
                 if (error) {
                     // Handle search error
                     alert("Error occur! Please try again later.");
+                    document.getElementById('store-list').innerHTML = `
+                        <div class="no-data-container">
+                            <i class="fas fa-search no-data-icon"></i>
+                            <p class="no-data-text">Click "Search" to find Apple Stores</p>
+                        </div>
+                    `;
+                    toggleSearchField(false);
+                    toggleMapsButton(false);
+                    toggleSidebarHeader(false);
                     return;
                 }
+                
+                // Clear existing annotations
+                map.removeAnnotations(map.annotations);
+                
+                // Check if we have any results
+                if (!data.places || data.places.length === 0) {
+                    // No results found - show message without flashing
+                    document.getElementById('store-list').innerHTML = `
+                        <div class="no-data-container">
+                            <i class="fas fa-store-slash no-data-icon"></i>
+                            <p class="no-data-text">No Apple Stores found in this region.</p>
+                        </div>
+                    `;
+                    toggleSearchField(false);
+                    toggleMapsButton(false);
+                    toggleSidebarHeader(false);
+                    allStores = [];
+                    return;
+                }
+                
                 var annotations = data.places.map(function(place) {
                     var annotation = new mapkit.MarkerAnnotation(place.coordinate);
                     annotation.title = place.name;
                     annotation.subtitle = place.formattedAddress;
-                    annotation.color = "#a6d6d6";
+                    annotation.color = "#007aff";
                     return annotation;
                 });
+                
                 map.showItems(annotations);
+                
+                // Store all results for filtering
+                allStores = data.places;
+                
+                // Show search field, maps button, reset button, and sidebar header if we have results
+                toggleSearchField(data.places.length > 0);
+                toggleMapsButton(data.places.length > 0);
+                toggleResetButton(data.places.length > 0);
+                toggleSidebarHeader(data.places.length > 0);
+                
+                // Populate sidebar with store list
+                filterStores();
             });
+        }
+
+        function changeLanguage() {
+            var languageSelect = document.getElementById('languageSelect');
+            var selectedLanguage = languageSelect.value;
+            
+            // Update map language - MapKit JS does support this
+            map.language = selectedLanguage;
+            
+            // Re-search to get results in new language if stores are already loaded
+            if (allStores.length > 0) {
+                mapSearch();
+            }
+        }
+
+        function openInMaps() {
+            // Get the current map region bounds
+            var region = map.region;
+            var center = region.center;
+            var span = region.span;
+            
+            // Calculate approximate bounds
+            var north = center.latitude + (span.latitudeDelta / 2);
+            var south = center.latitude - (span.latitudeDelta / 2);
+            var east = center.longitude + (span.longitudeDelta / 2);
+            var west = center.longitude - (span.longitudeDelta / 2);
+            
+            // Create Apple Maps URL with search for Apple Store in the current region
+            var mapsUrl = `https://maps.apple.com/?q=Apple+Store&ll=${center.latitude},${center.longitude}&spn=${span.latitudeDelta},${span.longitudeDelta}`;
+            
+            // Open in new tab/window
+            window.open(mapsUrl, '_blank');
         }
     </script>
 </body>
