@@ -1,9 +1,7 @@
 # FindMyAppleStore
-Easy find Apple Store in any region. Made with MapKit JS.
+Easy to find an Apple Store in any region. Made with MapKit JS.
 
-![screenshot1](https://raw.githubusercontent.com/1998code/FindMyAppleStore/main/screenshot1.png)
-![screenshot2](https://raw.githubusercontent.com/1998code/FindMyAppleStore/main/screenshot2.png)
-![screenshot3](https://raw.githubusercontent.com/1998code/FindMyAppleStore/main/screenshot3.png)
+<img width="1332" height="1035" alt="Screenshot 2025-07-26 at 11 53 10 PM" src="https://github.com/user-attachments/assets/86586be9-d62e-4a5e-8f5d-033f77d9e078" />
 
 ## How to deploy
 1. Clone this project
