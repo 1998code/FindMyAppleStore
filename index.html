@@ -3,26 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="2.0">
-<title>Find My: Apple Store - Locate Apple Stores Worldwide with Interactive Map</title>
-<meta name="description" content="Find Apple Store locations worldwide with our interactive map powered by Apple MapKit JS. Search by region, view store details, and get directions to the nearest Apple Store." />
-<meta name="keywords" content="Apple Store, Apple Store locations, find Apple Store, Apple retail, Apple Store map, Apple Store locator, Apple MapKit">
-<meta name="author" content="Find My Apple Store">
+<meta name="version" content="2.1">
+<title>Find My: Convenience Store - Locate Convenience Stores Worldwide with Interactive Map</title>
+<meta name="description" content="Find convenience store locations worldwide with our interactive map powered by Apple MapKit JS. Search by region, view store details, and get directions to the nearest convenience store." />
+<meta name="keywords" content="convenience store, 7-11, convenience store locations, find convenience store, retail, convenience store map, convenience store locator, Apple MapKit">
+<meta name="author" content="Find My Convenience Store">
 <meta name="robots" content="index, follow">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://findmyapplestore.vercel.app/">
-<meta property="og:title" content="Find My: Apple Store - Interactive Apple Store Locator">
-<meta property="og:description" content="Locate Apple Stores worldwide with our interactive map. Find store details, addresses, and get directions easily.">
-<meta property="og:image" content="https://findmyapplestore.vercel.app/og-image.jpg">
+<meta property="og:url" content="https://findmystore.vercel.app/">
+<meta property="og:title" content="Find My: Convenience Store - Interactive Convenience Store Locator">
+<meta property="og:description" content="Locate convenience stores worldwide with our interactive map. Find store details, addresses, and get directions easily.">
+<meta property="og:image" content="https://findmystore.vercel.app/og-image.jpg">
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://findmyapplestore.vercel.app/">
-<meta property="twitter:title" content="Find My: Apple Store - Interactive Apple Store Locator">
-<meta property="twitter:description" content="Locate Apple Stores worldwide with our interactive map. Find store details, addresses, and get directions easily.">
-<meta property="twitter:image" content="https://findmyapplestore.vercel.app/twitter-image.jpg">
+<meta property="twitter:url" content="https://findmystore.vercel.app/">
+<meta property="twitter:title" content="Find My: Convenience Store - Interactive Convenience Store Locator">
+<meta property="twitter:description" content="Locate convenience stores worldwide with our interactive map. Find store details, addresses, and get directions easily.">
+<meta property="twitter:image" content="https://findmystore.vercel.app/twitter-image.jpg">
 
 <!-- Favicons -->
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -35,19 +35,19 @@
 <!-- Apple Web App -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Find My Apple Store">
+<meta name="apple-mobile-web-app-title" content="Find My Convenience Store">
 
 <!-- Canonical URL -->
-<link rel="canonical" href="https://findmyapplestore.vercel.app/">
+<link rel="canonical" href="https://findmystore.vercel.app/">
 
 <!-- Structured Data -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Find My: Apple Store",
-  "description": "Interactive Apple Store locator with worldwide coverage",
-  "url": "https://findmyapplestore.vercel.app/",
+  "name": "Find My: Convenience Store",
+  "description": "Interactive convenience store locator with worldwide coverage",
+  "url": "https://findmystore.vercel.app/",
   "applicationCategory": "NavigationApplication",
   "operatingSystem": "Web Browser",
   "offers": {
@@ -150,6 +150,17 @@
     }
     
     .language-select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: inherit;
+        background: white;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    
+    .store-type-select {
         padding: 8px 12px;
         border: 1px solid #ccc;
         border-radius: 8px;
@@ -315,7 +326,7 @@
     .store-icon {
         width: 40px;
         height: 40px;
-        background: #007aff;
+        background: #34c759;
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -344,7 +355,7 @@
     
     .store-name::before {
         content: "|";
-        color: #007aff;
+        color: var(--separator-color, #34c759);
         font-weight: normal;
         font-size: 18px;
     }
@@ -481,6 +492,12 @@
             color: white;
         }
 
+        .store-type-select {
+            background: #3c3c41;
+            border: 1px solid #555;
+            color: white;
+        }
+
         .search-field {
             background: #3c3c41;
             border: 1px solid #555;
@@ -559,7 +576,8 @@
     }
     
     body[data-theme="light"] .region-select,
-    body[data-theme="light"] .theme-select {
+    body[data-theme="light"] .theme-select,
+    body[data-theme="light"] .store-type-select {
         background: white !important;
         border: 1px solid #ccc !important;
         color: black !important;
@@ -621,7 +639,8 @@
     }
     
     body[data-theme="dark"] .region-select,
-    body[data-theme="dark"] .theme-select {
+    body[data-theme="dark"] .theme-select,
+    body[data-theme="dark"] .store-type-select {
         background: #3c3c41 !important;
         border: 1px solid #555 !important;
         color: white !important;
@@ -656,25 +675,18 @@
 <body>
     <div class="topbar">
         <span class="topbar-title">
-            Find My: Apple Store
-            <span class="version-badge">2.0</span>
+            Find My: Convenience Store
+            <span class="version-badge">2.1</span>
         </span>
         <span class="topbar-subtitle">Powered by Apple MapKit JS</span>
         <div class="topbar-controls">
             <select class="region-select" id="regionSelect" onchange="changeRegion()">
-                <option value="us" selected>United States</option>
-                <option value="canada">Canada</option>
-                <option value="mexico">Mexico</option>
-                <option value="europe">Europe</option>
-                <option value="uk">United Kingdom</option>
-                <option value="asia">Asia Pacific</option>
-                <option value="japan">Japan</option>
-                <option value="hong-kong">Hong Kong</option>
-                <option value="india">India</option>
-                <option value="australia">Australia</option>
-                <option value="middle-east">Middle East</option>
-                <option value="africa">Africa</option>
-                <option value="south-america">South America</option>
+                <option value="hong-kong" selected>Hong Kong</option>
+                <option value="japan">Tokyo</option>
+            </select>
+            <select class="store-type-select" id="storeTypeSelect">
+                <option value="7-Eleven">7-Eleven</option>
+                <option value="Circle K">Circle K</option>
             </select>
             <select class="theme-select" id="themeSelect" onchange="changeTheme()">
                 <option value="system">System</option>
@@ -707,7 +719,7 @@
             <div id="store-list">
                 <div class="no-data-container">
                     <i class="fas fa-search no-data-icon"></i>
-                    <p class="no-data-text">Click "Search" to find Apple Stores</p>
+                    <p class="no-data-text">Click "Search" to find convenience stores</p>
                 </div>
             </div>
         </div>
@@ -717,7 +729,7 @@
 
     <script>
         // Replace your token (https://maps.developer.apple.com/token-maker)
-        const tokenID = "eyJraWQiOiJMUjNHNUdOUkxUIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI5UEFITFRHOEFEIiwiaWF0IjoxNzUzMDkzNzY1LCJvcmlnaW4iOiJmaW5kbXlhcHBsZXN0b3JlLnZlcmNlbC5hcHAifQ.aNQ5ppnw1tTpFPtP_cJCtwdF4C_T6HRojE8ufEqYJzf2F76eagfI9hKBQz4Ub5-IoCfnacZcOrtZXfUbBRQ61Q";
+        const tokenID = "eyJraWQiOiIySzVIVU05SlNaIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI5UEFITFRHOEFEIiwiaWF0IjoxNzUzNjAxOTIzLCJleHAiOjE3NTQyOTA3OTl9.8I5SfaK1fdNLxwAt1QrBg5fFaQWtfzDPxXpS_JAjI3U1ZMvR_MNvHykBJgCBF3cnSfPm9GOz8hqVDN28MHufcQ";
 
         mapkit.init({
             authorizationCallback: function(done) {
@@ -728,10 +740,10 @@
         var map = new mapkit.Map("map", {
             colorScheme: getThemeColorScheme()
         });
-        // Set initial US region instead of world
+        // Set initial Hong Kong region instead of world
         map.region = new mapkit.CoordinateRegion(
-            new mapkit.Coordinate(39.8283, -98.5795),
-            new mapkit.CoordinateSpan(25, 50)
+            new mapkit.Coordinate(22.3193, 114.1694),
+            new mapkit.CoordinateSpan(0.5, 0.8)
         );
 
         var allStores = []; // Store all search results for filtering
@@ -775,6 +787,25 @@
             // Update map color scheme
             map.colorScheme = isDark ? mapkit.Map.ColorSchemes.Dark : mapkit.Map.ColorSchemes.Light;
         }
+        
+        function updateStoreTypeOptions(region) {
+            var storeTypeSelect = document.getElementById('storeTypeSelect');
+            
+            if (region === "japan") {
+                // Tokyo options
+                storeTypeSelect.innerHTML = `
+                    <option value="7-Eleven">7-Eleven</option>
+                    <option value="FamilyMart">FamilyMart</option>
+                    <option value="Lawson">Lawson</option>
+                `;
+            } else {
+                // Hong Kong options
+                storeTypeSelect.innerHTML = `
+                    <option value="7-Eleven">7-Eleven</option>
+                    <option value="Circle K">Circle K</option>
+                `;
+            }
+        }
 
         function changeTheme() {
             var themeSelect = document.getElementById('themeSelect');
@@ -792,6 +823,9 @@
         function changeRegion() {
             var select = document.getElementById('regionSelect');
             var selectedRegion = select.value;
+            
+            // Update store type options based on region
+            updateStoreTypeOptions(selectedRegion);
             
             switch(selectedRegion) {
                 case 'us':
@@ -832,14 +866,14 @@
                     break;
                 case 'japan':
                     map.region = new mapkit.CoordinateRegion(
-                        new mapkit.Coordinate(36.2048, 138.2529),
-                        new mapkit.CoordinateSpan(10, 15)
+                        new mapkit.Coordinate(35.6762, 139.6503),
+                        new mapkit.CoordinateSpan(0.8, 1.2)
                     );
                     break;
                 case 'hong-kong':
                     map.region = new mapkit.CoordinateRegion(
                         new mapkit.Coordinate(22.3193, 114.1694),
-                        new mapkit.CoordinateSpan(1, 1.5)
+                        new mapkit.CoordinateSpan(0.5, 0.8)
                     );
                     break;
                 case 'india':
@@ -937,14 +971,14 @@
             map.removeAnnotations(map.annotations);
             allStores = [];
             
-            // Reset map to US region instead of world
+            // Reset map to Hong Kong region instead of world
             map.region = new mapkit.CoordinateRegion(
-                new mapkit.Coordinate(39.8283, -98.5795),
-                new mapkit.CoordinateSpan(25, 50)
+                new mapkit.Coordinate(22.3193, 114.1694),
+                new mapkit.CoordinateSpan(0.5, 0.8)
             );
             
-            // Reset region selector to US
-            document.getElementById('regionSelect').value = 'us';
+            // Reset region selector to Hong Kong
+            document.getElementById('regionSelect').value = 'hong-kong';
             
             // Hide search field, maps button, reset button, and sidebar header
             toggleSearchField(false);
@@ -956,7 +990,7 @@
             document.getElementById('store-list').innerHTML = `
                 <div class="no-data-container">
                     <i class="fas fa-search no-data-icon"></i>
-                    <p class="no-data-text">Click "Search" to find Apple Stores</p>
+                    <p class="no-data-text">Click "Search" to find convenience stores</p>
                 </div>
             `;
         }
@@ -988,12 +1022,33 @@
             filteredStores.forEach(function(place, index) {
                 var storeItem = document.createElement('div');
                 storeItem.className = 'store-item';
+                
+                // Get the selected store type to determine color
+                var storeTypeSelect = document.getElementById('storeTypeSelect');
+                var selectedStoreType = storeTypeSelect ? storeTypeSelect.value : "7-Eleven";
+                var iconColor;
+                var separatorColor;
+                
+                if (selectedStoreType === "Circle K") {
+                    iconColor = "#ff3b30"; // Red
+                    separatorColor = "#ff3b30";
+                } else if (selectedStoreType === "FamilyMart") {
+                    iconColor = "#5ac8fa"; // Light blue
+                    separatorColor = "#5ac8fa";
+                } else if (selectedStoreType === "Lawson") {
+                    iconColor = "#007aff"; // Deep blue
+                    separatorColor = "#007aff";
+                } else {
+                    iconColor = "#34c759"; // Green (7-Eleven)
+                    separatorColor = "#34c759";
+                }
+                
                 storeItem.innerHTML = `
-                    <div class="store-icon">
-                        <i class="fa-brands fa-apple"></i>
+                    <div class="store-icon" style="background-color: ${iconColor};">
+                        <i class="fas fa-store"></i>
                     </div>
                     <div class="store-content">
-                        <div class="store-name">${place.name}</div>
+                        <div class="store-name" style="--separator-color: ${separatorColor};">${place.name}</div>
                         <div class="store-address">${place.formattedAddress}</div>
                     </div>
                 `;
@@ -1019,14 +1074,45 @@
             toggleMapsButton(false);
             toggleSidebarHeader(false);
             
-            search.search("Apple Store", function(error, data) {
+            // Get the selected store type for better results
+            var storeTypeSelect = document.getElementById('storeTypeSelect');
+            var searchTerm = storeTypeSelect ? storeTypeSelect.value : "7-Eleven";
+            
+            // For 7-Eleven searches, use region-appropriate terms
+            if (searchTerm === "7-Eleven") {
+                var regionSelect = document.getElementById('regionSelect');
+                var selectedRegion = regionSelect ? regionSelect.value : "hong-kong";
+                if (selectedRegion === "japan") {
+                    searchTerm = "セブン-イレブン";
+                } else {
+                    searchTerm = "7-Eleven";
+                }
+            }
+            // For Circle K searches
+            if (searchTerm === "Circle K") {
+                searchTerm = "Circle K";
+            }
+            // For FamilyMart searches
+            if (searchTerm === "FamilyMart") {
+                searchTerm = "ファミリーマート";
+            }
+            // For Lawson searches
+            if (searchTerm === "Lawson") {
+                searchTerm = "ローソン";
+            }
+            // For Japanese convenience store searches
+            if (searchTerm === "コンビニ") {
+                searchTerm = "コンビニ";
+            }
+            
+            search.search(searchTerm, function(error, data) {
                 if (error) {
                     // Handle search error
                     alert("Error occur! Please try again later.");
                     document.getElementById('store-list').innerHTML = `
                         <div class="no-data-container">
                             <i class="fas fa-search no-data-icon"></i>
-                            <p class="no-data-text">Click "Search" to find Apple Stores</p>
+                            <p class="no-data-text">Click "Search" to find convenience stores</p>
                         </div>
                     `;
                     toggleSearchField(false);
@@ -1040,25 +1126,115 @@
                 
                 // Check if we have any results
                 if (!data.places || data.places.length === 0) {
-                    // No results found - show message without flashing
-                    document.getElementById('store-list').innerHTML = `
-                        <div class="no-data-container">
-                            <i class="fas fa-store-slash no-data-icon"></i>
-                            <p class="no-data-text">No Apple Stores found in this region.</p>
-                        </div>
-                    `;
-                    toggleSearchField(false);
-                    toggleMapsButton(false);
-                    toggleSidebarHeader(false);
-                    allStores = [];
+                    // Try fallback search for 7-Eleven (Japan)
+                    if (searchTerm === "セブン-イレブン") {
+                        search.search("ファミリーマート", function(error2, data2) {
+                            if (!error2 && data2.places && data2.places.length > 0) {
+                                processSearchResults(data2);
+                            } else {
+                                showNoResults();
+                            }
+                        });
+                        return;
+                    }
+                    // Try fallback search for 7-Eleven (Hong Kong)
+                    if (searchTerm === "7-Eleven store") {
+                        search.search("Circle K store", function(error2, data2) {
+                            if (!error2 && data2.places && data2.places.length > 0) {
+                                processSearchResults(data2);
+                            } else {
+                                showNoResults();
+                            }
+                        });
+                        return;
+                    }
+                    // Try fallback search for FamilyMart
+                    if (searchTerm === "ファミリーマート") {
+                        search.search("ローソン", function(error2, data2) {
+                            if (!error2 && data2.places && data2.places.length > 0) {
+                                processSearchResults(data2);
+                            } else {
+                                showNoResults();
+                            }
+                        });
+                        return;
+                    }
+                    showNoResults();
                     return;
                 }
+                
+                // If we have very few results for 7-Eleven (Japan), try FamilyMart
+                if (data.places.length < 3 && searchTerm === "セブン-イレブン") {
+                    search.search("ファミリーマート", function(error2, data2) {
+                        if (!error2 && data2.places && data2.places.length > data.places.length) {
+                            processSearchResults(data2);
+                        } else {
+                            processSearchResults(data);
+                        }
+                    });
+                    return;
+                }
+                // If we have very few results for 7-Eleven (Hong Kong), try Circle K
+                if (data.places.length < 3 && searchTerm === "7-Eleven store") {
+                    search.search("Circle K store", function(error2, data2) {
+                        if (!error2 && data2.places && data2.places.length > data.places.length) {
+                            processSearchResults(data2);
+                        } else {
+                            processSearchResults(data);
+                        }
+                    });
+                    return;
+                }
+                // If we have very few results for FamilyMart, try Lawson
+                if (data.places.length < 3 && searchTerm === "ファミリーマート") {
+                    search.search("ローソン", function(error2, data2) {
+                        if (!error2 && data2.places && data2.places.length > data.places.length) {
+                            processSearchResults(data2);
+                        } else {
+                            processSearchResults(data);
+                        }
+                    });
+                    return;
+                }
+                
+                processSearchResults(data);
+            });
+            
+            function showNoResults() {
+                document.getElementById('store-list').innerHTML = `
+                    <div class="no-data-container">
+                        <i class="fas fa-store-slash no-data-icon"></i>
+                        <p class="no-data-text">No convenience stores found in this region.</p>
+                    </div>
+                `;
+                toggleSearchField(false);
+                toggleMapsButton(false);
+                toggleSidebarHeader(false);
+                allStores = [];
+            }
+            
+            function processSearchResults(data) {
                 
                 var annotations = data.places.map(function(place) {
                     var annotation = new mapkit.MarkerAnnotation(place.coordinate);
                     annotation.title = place.name;
                     annotation.subtitle = place.formattedAddress;
-                    annotation.color = "#007aff";
+                    // Use different colors based on store type
+                    var storeTypeSelect = document.getElementById('storeTypeSelect');
+                    var selectedStoreType = storeTypeSelect ? storeTypeSelect.value : "7-Eleven";
+                    var annotationColor;
+                    
+                    if (selectedStoreType === "Circle K") {
+                        annotationColor = "#ff3b30"; // Red
+                    } else if (selectedStoreType === "FamilyMart") {
+                        annotationColor = "#5ac8fa"; // Light blue
+                    } else if (selectedStoreType === "Lawson") {
+                        annotationColor = "#007aff"; // Deep blue
+                    } else {
+                        annotationColor = "#34c759"; // Green (7-Eleven)
+                    }
+                    
+                    annotation.color = annotationColor;
                     return annotation;
                 });
                 
@@ -1075,7 +1251,7 @@
                 
                 // Populate sidebar with store list
                 filterStores();
-            });
+            }
         }
 
         function changeLanguage() {
@@ -1103,8 +1279,10 @@
             var east = center.longitude + (span.longitudeDelta / 2);
             var west = center.longitude - (span.longitudeDelta / 2);
             
-            // Create Apple Maps URL with search for Apple Store in the current region
-            var mapsUrl = `https://maps.apple.com/?q=Apple+Store&ll=${center.latitude},${center.longitude}&spn=${span.latitudeDelta},${span.longitudeDelta}`;
+            // Create Apple Maps URL with search for convenience stores in the current region
+            var storeTypeSelect = document.getElementById('storeTypeSelect');
+            var searchTerm = storeTypeSelect ? storeTypeSelect.value : "7-Eleven";
+            var mapsUrl = `https://maps.apple.com/?q=${encodeURIComponent(searchTerm)}&ll=${center.latitude},${center.longitude}&spn=${span.longitudeDelta},${span.longitudeDelta}`;
             
             // Open in new tab/window
             window.open(mapsUrl, '_blank');
