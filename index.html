@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="2.0">
+<meta name="version" content="2.1">
 <title>Find My: Apple Store - Locate Apple Stores Worldwide with Interactive Map</title>
 <meta name="description" content="Find Apple Store locations worldwide with our interactive map powered by Apple MapKit JS. Search by region, view store details, and get directions to the nearest Apple Store." />
 <meta name="keywords" content="Apple Store, Apple Store locations, find Apple Store, Apple retail, Apple Store map, Apple Store locator, Apple MapKit">
@@ -58,7 +58,7 @@
 }
 </script>
 
-<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.core.js" crossorigin async data-callback="initMapKit" data-libraries="map,annotations,services,look-around"></script>
 <link rel="stylesheet" href="https://cdn.1998.media/css/fontawesome.css">
 <style>
     * {
@@ -311,6 +311,10 @@
     .store-item:hover {
         background: #e8e8ed;
     }
+    .store-item.active {
+        background: #e8e8ed;
+        border: 3px solid #007aff;
+    }
     
     .store-icon {
         width: 40px;
@@ -395,6 +399,61 @@
     .mk-map-view {
         border-radius: 15px;
     }
+    /* Icon-only action button */
+    .icon-btn {
+        padding: 6px;
+        background: #9e9e9e;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    .icon-btn:hover {
+        background: #8a8a8a;
+    }
+    /* Look Around overlay */
+    #lookaround-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    #lookaround-panel {
+        width: min(1000px, 92vw);
+        height: min(700px, 80vh);
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    #lookaround-close {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+        background: rgba(0,0,0,0.6);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    #lookaround-container {
+        width: 100%;
+        height: 100%;
+        background: #000;
+    }
     
     /* Mobile/Tablet layout */
     @media (max-width: 767px) {
@@ -457,6 +516,10 @@
         
         .store-item:hover {
             background: #4a4a4f;
+        }
+        .store-item.active {
+            background: #4a4a4f;
+            border: 3px solid #0a84ff;
         }
         
         .store-address {
@@ -657,7 +720,7 @@
     <div class="topbar">
         <span class="topbar-title">
             Find My: Apple Store
-            <span class="version-badge">2.0</span>
+            <span class="version-badge">2.1</span>
         </span>
         <span class="topbar-subtitle">Powered by Apple MapKit JS</span>
         <div class="topbar-controls">
@@ -713,28 +776,40 @@
         </div>
         
         <div id="map"></div>
+        <div id="lookaround-overlay">
+            <div id="lookaround-panel">
+                <button id="lookaround-close" onclick="closeLookAround()">Close</button>
+                <div id="lookaround-container"></div>
+            </div>
+        </div>
     </div>
 
     <script>
         // Replace your token (https://maps.developer.apple.com/token-maker)
         const tokenID = "eyJraWQiOiJGUFZKS0pUVU5UIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI5UEFITFRHOEFEIiwiaWF0IjoxNzUzNzU5NzkzLCJvcmlnaW4iOiJmaW5kbXlhcHBsZXN0b3JlLnZlcmNlbC5hcHAifQ.2LhI6Y6H9j0DynNU9yhkYJftqXDiHiUiyw00g1LkWa6MNroarbmueMBLHnay1x9zIiTU5PPKiDl3v1OQ7RT-tw";
 
-        mapkit.init({
-            authorizationCallback: function(done) {
-                done(tokenID);
-            }
-        });
-
-        var map = new mapkit.Map("map", {
-            colorScheme: getThemeColorScheme()
-        });
-        // Set initial US region instead of world
-        map.region = new mapkit.CoordinateRegion(
-            new mapkit.Coordinate(39.8283, -98.5795),
-            new mapkit.CoordinateSpan(25, 50)
-        );
-
+        var map = null;
         var allStores = []; // Store all search results for filtering
+        var lookAroundView = null; // Active Look Around instance
+        var onMapSelect = null; // Map select event handler
+
+        // Wait for MapKit JS to be ready
+        window.initMapKit = function() {
+            try {
+                mapkit.init({
+                    authorizationCallback: function(done) { done(tokenID); }
+                });
+
+                map = new mapkit.Map("map", { colorScheme: getThemeColorScheme() });
+                // Set initial US region instead of world
+                map.region = new mapkit.CoordinateRegion(
+                    new mapkit.Coordinate(39.8283, -98.5795),
+                    new mapkit.CoordinateSpan(25, 50)
+                );
+            } catch (e) {
+                console.error('MapKit initialization failed', e);
+            }
+        };
 
         function getThemeColorScheme() {
             var themeSelect = document.getElementById('themeSelect');
@@ -985,6 +1060,7 @@
                 filteredStores = allStores;
             }
             
+            var recordElements = [];
             filteredStores.forEach(function(place, index) {
                 var storeItem = document.createElement('div');
                 storeItem.className = 'store-item';
@@ -996,6 +1072,11 @@
                         <div class="store-name">${place.name}</div>
                         <div class="store-address">${place.formattedAddress}</div>
                     </div>
+                    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+                        <button type="button" class="icon-btn la-btn" title="望遠鏡">
+                            <i class="fas fa-binoculars"></i>
+                        </button>
+                    </div>
                 `;
                 
                 storeItem.addEventListener('click', function() {
@@ -1004,10 +1085,55 @@
                     if (originalIndex !== -1) {
                         map.annotations[originalIndex].selected = true;
                     }
+                    // Highlight selected record
+                    document.querySelectorAll('.store-item.active').forEach(function(el){ el.classList.remove('active'); });
+                    storeItem.classList.add('active');
+                    storeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 });
                 
+                // Wire Look Around button
+                var laBtn = storeItem.querySelector('.la-btn');
+                if (laBtn) {
+                    laBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (window.mapkit && mapkit.LookAround) {
+                            openLookAround(place);
+                        } else {
+                            alert('Look Around is not available in this environment.');
+                        }
+                    });
+                }
+                // Apple icon no longer opens Look Around; binoculars button only
+                
                 storeList.appendChild(storeItem);
+                recordElements.push({ el: storeItem, place: place });
             });
+            // Attach map pin select behavior to highlight/scroll the matching record
+            function attachPinSelectHandler() {
+                try { if (onMapSelect) map.removeEventListener('select', onMapSelect); } catch (e) {}
+                onMapSelect = function(event) {
+                    if (!event || !event.annotation) return;
+                    var a = event.annotation;
+                    var match = recordElements.find(function(item) {
+                        return item.place.name === a.title && item.place.formattedAddress === a.subtitle;
+                    });
+                    if (!match && a.coordinate) {
+                        match = recordElements.find(function(item) {
+                            var p = item.place;
+                            return p.coordinate &&
+                                   Math.abs(p.coordinate.latitude - a.coordinate.latitude) < 1e-6 &&
+                                   Math.abs(p.coordinate.longitude - a.coordinate.longitude) < 1e-6;
+                        });
+                    }
+                    if (match) {
+                        document.querySelectorAll('.store-item.active').forEach(function(el){ el.classList.remove('active'); });
+                        match.el.classList.add('active');
+                        match.el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                };
+                map.addEventListener('select', onMapSelect);
+            }
+            attachPinSelectHandler();
         }
 
         function mapSearch() {
@@ -1063,6 +1189,8 @@
                 });
                 
                 map.showItems(annotations);
+
+                // Do not auto-open Look Around on pin select
                 
                 // Store all results for filtering
                 allStores = data.places;
@@ -1108,6 +1236,139 @@
             
             // Open in new tab/window
             window.open(mapsUrl, '_blank');
+        }
+
+        function openLookAround(place) {
+            try {
+                var overlay = document.getElementById('lookaround-overlay');
+                var container = document.getElementById('lookaround-container');
+
+                // Clear previous instance/content
+                if (lookAroundView && typeof lookAroundView.destroy === 'function') {
+                    lookAroundView.destroy();
+                }
+                container.innerHTML = '';
+
+                // Prefer PlaceID from the place when available
+                var placeId = place && (place.placeId || place.id);
+                if (placeId && mapkit.PlaceLookup) {
+                    var lookup = new mapkit.PlaceLookup();
+                    return lookup.getPlace(placeId, function(error, resolvedPlace) {
+                        if (error || !resolvedPlace) {
+                            // Fallback to coordinate probing
+                            return openLookAroundByCoordinate(place && place.coordinate);
+                        }
+                        try {
+                            var sceneReq = new mapkit.LookAroundSceneRequest(resolvedPlace.coordinate);
+                            sceneReq.getScene(function(err, scene) {
+                                // If imagery isn't available as a scene, still open the dialog with the Place
+                                // so the built-in UI can display the availability message.
+                                if (scene) {
+                                    overlay.style.display = 'flex';
+                                    lookAroundView = new mapkit.LookAround(container, scene, { showsDialogControl: true });
+                                } else {
+                                    // Try probing nearby road coords for a scene
+                                    probeNearestLookAroundScene(resolvedPlace.coordinate, function(scene2) {
+                                        overlay.style.display = 'flex';
+                                        lookAroundView = new mapkit.LookAround(
+                                            container,
+                                            scene2 || resolvedPlace,
+                                            { showsDialogControl: true }
+                                        );
+                                    });
+                                }
+                            });
+                        } catch (e2) {
+                            // Fallback: probe nearby road coords
+                            probeNearestLookAroundScene(resolvedPlace.coordinate, function(scene2) {
+                                overlay.style.display = 'flex';
+                                lookAroundView = new mapkit.LookAround(
+                                    container,
+                                    scene2 || resolvedPlace,
+                                    { showsDialogControl: true }
+                                );
+                            });
+                        }
+                    });
+                }
+
+                // No PlaceID: try probing nearby road coords from the given coordinate
+                openLookAroundByCoordinate(place && place.coordinate);
+            } catch (e) {
+                console.error('Look Around failed:', e);
+                closeLookAround();
+            }
+        }
+
+        function openLookAroundByCoordinate(coordinate) {
+            if (!coordinate) {
+                return alert('Look Around is not available for this location.');
+            }
+            var overlay = document.getElementById('lookaround-overlay');
+            var container = document.getElementById('lookaround-container');
+            try {
+                probeNearestLookAroundScene(coordinate, function(scene) {
+                    overlay.style.display = 'flex';
+                    lookAroundView = new mapkit.LookAround(
+                        container,
+                        scene || new mapkit.Place({ coordinate: coordinate }),
+                        { showsDialogControl: true }
+                    );
+                });
+            } catch (e) {
+                console.error('Look Around by coordinate failed:', e);
+                alert('Look Around is not available for this location.');
+            }
+        }
+
+        // Probe for nearest Look Around scene around a base coordinate by sampling nearby road-adjacent points
+        function probeNearestLookAroundScene(baseCoord, callback) {
+            var lat = baseCoord.latitude;
+            var lon = baseCoord.longitude;
+            function offsetCoord(northMeters, eastMeters) {
+                var dLat = northMeters / 111320; // approx meters to degrees latitude
+                var dLon = eastMeters / (111320 * Math.cos(lat * Math.PI / 180));
+                return new mapkit.Coordinate(lat + dLat, lon + dLon);
+            }
+            var distances = [0, 20, 40, 80, 120, 200];
+            var dirs = [
+                [0,0], [1,0], [-1,0], [0,1], [0,-1],
+                [1,1], [1,-1], [-1,1], [-1,-1]
+            ];
+            var samples = [];
+            for (var i = 0; i < distances.length; i++) {
+                for (var j = 0; j < dirs.length; j++) {
+                    var d = distances[i];
+                    var dir = dirs[j];
+                    samples.push(offsetCoord(dir[0]*d, dir[1]*d));
+                }
+            }
+            var idx = 0;
+            function tryNext() {
+                if (idx >= samples.length) return callback(null);
+                var c = samples[idx++];
+                try {
+                    var req = new mapkit.LookAroundSceneRequest(c);
+                    req.getScene(function(err, scene) {
+                        if (!err && scene) return callback(scene);
+                        tryNext();
+                    });
+                } catch (e) {
+                    tryNext();
+                }
+            }
+            tryNext();
+        }
+
+        function closeLookAround() {
+            var overlay = document.getElementById('lookaround-overlay');
+            var container = document.getElementById('lookaround-container');
+            overlay.style.display = 'none';
+            if (lookAroundView && typeof lookAroundView.destroy === 'function') {
+                lookAroundView.destroy();
+            }
+            lookAroundView = null;
+            container.innerHTML = '';
         }
     </script>
 </body>
